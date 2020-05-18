@@ -1,5 +1,6 @@
 package ru.job4j.puzzle;
 
+import javafx.scene.control.skin.VirtualFlow;
 import ru.job4j.puzzle.firuges.Cell;
 import ru.job4j.puzzle.firuges.Figure;
 
@@ -68,9 +69,37 @@ public class Logic {
         return rst;
     }
 
+    public boolean virtualWin (int[][] table, int column) {
+        boolean check = true;
+        for (int row = 0; row < table.length; row++) {
+            if (table[row][column] != 1) {
+                check = false;
+                break;
+            }
+        }
+        return check;
+    }
+
+    public boolean horizontalWin (int[][] table, int column) {
+        boolean check = true;
+        for (int row = 0; row < table.length; row++) {
+            if (table[column][row] != 1) {
+                check = false;
+                break;
+            }
+        }
+        return check;
+    }
+
     public boolean isWin() {
         int[][] table = this.convert();
         boolean result = false;
+        for (int i = 0; i < table.length; i++) {
+            if ((virtualWin(table, i)) || (horizontalWin(table, i))) {
+                result = true;
+                break;
+            }
+        }
         return result;
     }
 

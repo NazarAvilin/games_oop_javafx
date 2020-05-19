@@ -95,9 +95,11 @@ public class Logic {
         int[][] table = this.convert();
         boolean result = false;
         for (int i = 0; i < table.length; i++) {
-            if ((verticalWin(table, i)) || (horizontalWin(table, i))) {
-                result = true;
-                break;
+            if (table[i][i] == 1) {
+                if ((verticalWin(table, i)) || (horizontalWin(table, i))) {
+                    result = true;
+                    break;
+                }
             }
         }
         return result;

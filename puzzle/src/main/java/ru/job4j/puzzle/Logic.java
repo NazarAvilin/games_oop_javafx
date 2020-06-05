@@ -1,9 +1,8 @@
 package ru.job4j.puzzle;
 
-import javafx.scene.control.skin.VirtualFlow;
+
 import ru.job4j.puzzle.firuges.Cell;
 import ru.job4j.puzzle.firuges.Figure;
-
 import java.util.Arrays;
 
 /**
@@ -14,14 +13,9 @@ import java.util.Arrays;
  * @since 0.1
  */
 public class Logic {
-    private final int size;
-    private final Figure[] figures;
-    private int index = 0;
 
-    public Logic(int size) {
-        this.size = size;
-        this.figures = new Figure[size * size];
-    }
+    private final Figure[] figures = new Figure[32];
+    private int index = 0;
 
     public void add(Figure figure) {
         this.figures[this.index++] = figure;
@@ -32,7 +26,7 @@ public class Logic {
         int index = this.findBy(source);
         if (index != -1) {
             Cell[] steps = this.figures[index].way(source, dest);
-            if (this.isFree(steps)) {
+            if (isFree(steps)&&steps.length > 0 && steps[steps.length - 1].equals(dest)) {
                 rst = true;
                 this.figures[index] = this.figures[index].copy(dest);
             }
@@ -40,21 +34,8 @@ public class Logic {
         return rst;
     }
 
-    public boolean isFree(Cell ... cells) {
-        boolean result = cells.length > 0;
-        for (Cell cell : cells) {
-            if (this.findBy(cell) != -1) {
-               result = false;
-               break;
-            }
-        }
-        return result;
-    }
-
     public void clean() {
-        for (int position = 0; position != this.figures.length; position++) {
-            this.figures[position] = null;
-        }
+        Arrays.fill(this.figures, null);
         this.index = 0;
     }
 
@@ -69,57 +50,22 @@ public class Logic {
         return rst;
     }
 
-    public boolean verticalWin (int[][] table, int column) {
-        boolean check = true;
-        for (int row = 0; row < table.length; row++) {
-            if (table[row][column] != 1) {
-                check = false;
-                break;
-            }
-        }
-        return check;
-    }
-
-    public boolean horizontalWin (int[][] table, int column) {
-        boolean check = true;
-        for (int row = 0; row < table.length; row++) {
-            if (table[column][row] != 1) {
-                check = false;
-                break;
-            }
-        }
-        return check;
-    }
-
-    public boolean isWin() {
-        int[][] table = this.convert();
-        boolean result = false;
-        for (int i = 0; i < table.length; i++) {
-            if (table[i][i] == 1) {
-                if ((verticalWin(table, i)) || (horizontalWin(table, i))) {
-                    result = true;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    public int[][] convert() {
-        int[][] table = new int[this.size][this.size];
-        for (int row = 0; row != table.length; row++) {
-            for (int cell = 0; cell != table.length; cell++) {
-                int position = this.findBy(new Cell(row, cell));
-                if (position != -1 && this.figures[position].movable()) {
-                    table[row][cell] = 1;
-                }
-            }
-        }
-        return table;
-    }
-
     @Override
     public String toString() {
-        return Arrays.toString(this.convert());
+        return "Logic{" +
+                "figures=" + Arrays.toString(this.figures) +
+                '}';
+    }
+
+    private boolean isFree(Cell[] steps) {
+        boolean rst = true;
+        for (Cell cell : steps
+        ) {
+            if (this.findBy(cell) >= 0) {
+                rst = false;
+                break;
+            }
+        }
+        return rst;
     }
 }

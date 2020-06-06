@@ -24,12 +24,18 @@ public class Logic {
     public boolean move(Cell source, Cell dest) {
         boolean rst = false;
         int index = this.findBy(source);
-        if (index != -1) {
-            Cell[] steps = this.figures[index].way(source, dest);
-            if (isFree(steps)&&steps.length > 0 && steps[steps.length - 1].equals(dest)) {
-                rst = true;
-                this.figures[index] = this.figures[index].copy(dest);
+        System.out.println(index);
+        Cell[] steps = this.figures[index].way(source, dest);
+        boolean free = true;
+        for (Cell step : steps) {
+            if (findBy(step) != -1) {
+                free = false;
+                break;
             }
+        }
+        if (free) {
+            figures[index] = figures[index].copy(dest);
+            rst = true;
         }
         return rst;
     }

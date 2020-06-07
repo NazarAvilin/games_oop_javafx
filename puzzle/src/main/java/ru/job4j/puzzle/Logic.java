@@ -14,8 +14,14 @@ import java.util.Arrays;
  */
 public class Logic {
 
-    private final Figure[] figures = new Figure[32];
+    private final int size;
+    private final Figure[] figures;
     private int index = 0;
+
+    public Logic(int size) {
+        this.size = size;
+        this.figures = new Figure[size * size];
+    }
 
     public void add(Figure figure) {
         this.figures[this.index++] = figure;
@@ -24,24 +30,31 @@ public class Logic {
     public boolean move(Cell source, Cell dest) {
         boolean rst = false;
         int index = this.findBy(source);
-        System.out.println(index);
-        Cell[] steps = this.figures[index].way(source, dest);
-        boolean free = true;
-        for (Cell step : steps) {
-            if (findBy(step) != -1) {
-                free = false;
-                break;
+        if (index != -1) {
+            Cell[] steps = this.figures[index].way(source, dest);
+            if (this.isFree(steps)) {
+                rst = true;
+                this.figures[index] = this.figures[index].copy(dest);
             }
-        }
-        if (free) {
-            figures[index] = figures[index].copy(dest);
-            rst = true;
         }
         return rst;
     }
 
+    public boolean isFree(Cell ... cells) {
+        boolean result = cells.length > 0;
+        for (Cell cell : cells) {
+            if (this.findBy(cell) != -1) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
     public void clean() {
-        Arrays.fill(this.figures, null);
+        for (int position = 0; position != this.figures.length; position++) {
+            this.figures[position] = null;
+        }
         this.index = 0;
     }
 
@@ -56,22 +69,27 @@ public class Logic {
         return rst;
     }
 
-    @Override
-    public String toString() {
-        return "Logic{" +
-                "figures=" + Arrays.toString(this.figures) +
-                '}';
+    public boolean isWin() {
+        int[][] table = this.convert();
+        boolean result = false;
+        return result;
     }
 
-    private boolean isFree(Cell[] steps) {
-        boolean rst = true;
-        for (Cell cell : steps
-        ) {
-            if (this.findBy(cell) >= 0) {
-                rst = false;
-                break;
+    public int[][] convert() {
+        int[][] table = new int[this.size][this.size];
+        for (int row = 0; row != table.length; row++) {
+            for (int cell = 0; cell != table.length; cell++) {
+                int position = this.findBy(new Cell(row, cell));
+                if (position != -1 && this.figures[position].movable()) {
+                    table[row][cell] = 1;
+                }
             }
         }
-        return rst;
+        return table;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(this.convert());
     }
 }

@@ -1,5 +1,6 @@
 package job4j.tictactoe;
 
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 public class Logic3T {
@@ -24,20 +25,31 @@ public class Logic3T {
     }
 
     public boolean isWinnerX() {
-        return this.fillBy(Figure3T::hasMarkX, 0, 0, 1, 0) ||
-                this.fillBy(Figure3T::hasMarkX, 0, 0, 0, 1) ||
-                this.fillBy(Figure3T::hasMarkX, 0,0, 1, 1) ||
-                this.fillBy(Figure3T::hasMarkX, this.table.length - 1 , 0, -1, 1);
+        return this.checkAllCells(Figure3T::hasMarkX);
     }
 
     public boolean isWinnerO() {
-        return this.fillBy(Figure3T::hasMarkO, 0, 0, 1, 0) ||
-                this.fillBy(Figure3T::hasMarkO, 0, 0, 0, 1) ||
-                this.fillBy(Figure3T::hasMarkO, 0,0, 1, 1) ||
-                this.fillBy(Figure3T::hasMarkO, this.table.length - 1, 0, -1, 1);
+        return this.checkAllCells(Figure3T::hasMarkO);
+    }
+
+    private boolean checkAllCells(Predicate<Figure3T> predicate) {
+        boolean rsl = this.fillBy(predicate, 0,0, 1, 1) ||
+                this.fillBy(predicate, this.table.length - 1, 0, -1, 1);
+        if (!rsl) {
+            for (int i = 0; i < this.table.length; i++) {
+                rsl = this.fillBy(predicate, 0, i, 1, 0) ||
+                        this.fillBy(predicate, i, 0, 0, 1);
+                if(rsl) {
+                    break;
+                }
+            }
+        }
+        return rsl;
     }
 
     public boolean hasGap() {
-        return true;
+        return Arrays.stream(this.table)
+                .flatMap(Arrays::stream)
+                .anyMatch(f -> f.hasMarkX() == f.hasMarkO());
     }
 }
